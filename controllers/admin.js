@@ -20,12 +20,14 @@ exports.postAddProduct = (req, res, next) => {
       imageUrl: imageUrl,
       description: description,
     })
-
     .then((result) => {
-      console.log("created product");
+      // console.log(result);
+      console.log("Created Product");
       res.redirect("/admin/products");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -35,8 +37,8 @@ exports.getEditProduct = (req, res, next) => {
   }
   const prodId = req.params.productId;
   req.user
-    .getProducts({ id: prodId })
-    //Product.findByPk(prodId)
+    .getProducts({ where: { id: prodId } })
+    // Product.findByPk(prodId)
     .then((products) => {
       const product = products[0];
       if (!product) {
@@ -58,18 +60,19 @@ exports.postEditProduct = (req, res, next) => {
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.imageUrl;
   const updatedDesc = req.body.description;
-
-  Product.findById(prodId)
+  Product.findByPk(prodId)
     .then((product) => {
-      (product.title = updatedTitle),
-        (product.price = updatedPrice),
-        (product.description = updatedDesc),
-        (product.imageUrl = updatedImageUrl);
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.description = updatedDesc;
+      product.imageUrl = updatedImageUrl;
       return product.save();
     })
-    .then((result) => console.log("Updated Product"))
+    .then((result) => {
+      console.log("UPDATED PRODUCT!");
+      res.redirect("/admin/products");
+    })
     .catch((err) => console.log(err));
-  res.redirect("/admin/products");
 };
 
 exports.getProducts = (req, res, next) => {
@@ -83,13 +86,6 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch((err) => console.log(err));
-  // Product.fetchAll((products) => {
-  //   res.render("admin/products", {
-  //     prods: products,
-  //     pageTitle: "Admin Products",
-  //     path: "/admin/products",
-  //   });
-  // });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
